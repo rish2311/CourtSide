@@ -44,6 +44,10 @@ export class ApiError extends Error {
     return new ApiError(404, message);
   }
 
+  static conflict(message: string, errors?: Record<string, string[]>) {
+    return new ApiError(409, message, errors);
+  }
+
   static internal(message = "Internal Server Error") {
     return new ApiError(500, message, {}, false);
   }
