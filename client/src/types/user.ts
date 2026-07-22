@@ -1,19 +1,25 @@
-// ─── User ─────────────────────────────────────────────────────────────────────
+export const UserRole = {
+  PLAYER: "PLAYER",
+  OWNER: "OWNER",
+  ADMIN: "ADMIN",
+} as const;
 
-export type UserRole = 'user' | 'venue_owner' | 'admin';
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 export interface User {
-  _id: string;
-  name: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
   email: string;
-  role: UserRole;
-  avatar?: string;
   phone?: string;
-  createdAt: string;
-  updatedAt: string;
+  avatar?: string;
+  role: UserRole;
+  isVerified: boolean;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
-
-// ─── Auth Payloads ────────────────────────────────────────────────────────────
 
 export interface LoginPayload {
   email: string;
@@ -21,13 +27,22 @@ export interface LoginPayload {
 }
 
 export interface RegisterPayload {
-  name: string;
+  firstName: string;
+  lastName: string;
+  username: string;
   email: string;
   password: string;
-  role?: UserRole;
+  confirmPassword: string;
+}
+
+export interface UpdateProfilePayload {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  avatar?: string;
 }
 
 export interface AuthResponse {
   user: User;
-  token: string;
+  accessToken: string;
 }

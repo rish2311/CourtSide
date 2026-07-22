@@ -163,8 +163,8 @@ export async function updateProfile(
     userId,
     { $set: allowedUpdates },
     {
-      new: true,      // return updated document
-      runValidators: true, // enforce mongoose schema validators on update
+      returnDocument: "after",
+      runValidators: true,
     }
   );
 

@@ -35,6 +35,11 @@ export interface Venue {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  // Design System Extensions
+  distance?: number;          // in miles
+  isFullyBooked?: boolean;
+  tags?: string[];            // e.g., ['Fast-Track', 'Premium']
+  simulatedCoords?: { x: number; y: number }; // Normalized 0-100 for prototype map
 }
 
 // ─── Venue Filters ────────────────────────────────────────────────────────────

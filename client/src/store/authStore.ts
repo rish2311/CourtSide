@@ -1,14 +1,5 @@
-import { create } from 'zustand';
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'user' | 'venue_owner' | 'admin';
-  avatar?: string;
-}
+import { create } from "zustand";
+import type { User } from "../types/user";
 
 interface AuthState {
   user: User | null;
@@ -16,32 +7,41 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
 
-  // Actions
   login: (user: User, token: string) => void;
   logout: () => void;
   setUser: (user: User) => void;
   setLoading: (loading: boolean) => void;
+  hydrate: () => void;
 }
 
-// ─── Store ────────────────────────────────────────────────────────────────────
-
 const useAuthStore = create<AuthState>((set) => ({
-  // Initial state
   user: null,
   token: null,
   isAuthenticated: false,
-  loading: false,
+  loading: true,
 
-  // Actions
-  login: (user, token) =>
-    set({ user, token, isAuthenticated: true, loading: false }),
+  login: (user, token) => {
+    localStorage.setItem("token", token);
+    set({ user, token, isAuthenticated: true, loading: false });
+  },
 
-  logout: () =>
-    set({ user: null, token: null, isAuthenticated: false, loading: false }),
+  logout: () => {
+    localStorage.removeItem("token");
+    set({ user: null, token: null, isAuthenticated: false, loading: false });
+  },
 
   setUser: (user) => set({ user }),
 
   setLoading: (loading) => set({ loading }),
+
+  hydrate: () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      set({ token, loading: false });
+    } else {
+      set({ loading: false });
+    }
+  },
 }));
 
 export default useAuthStore;
