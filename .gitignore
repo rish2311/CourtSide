@@ -8,4 +8,4 @@ build
 *.log
 bun.lock
 bun.lockb
-.ai/
+
