@@ -1,21 +1,24 @@
+import crypto from "crypto";
 import User from "../model/user.model";
 import { ApiError } from "../../../shared/errors";
-import { generateAccessToken } from "../../../utils/jwt";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../../../utils/jwt";
 import type {
   UserDTO,
   RegisterInput,
   LoginInput,
   UpdateProfileInput,
 } from "../types/user.types";
+import type {
+  ForgotPasswordInput,
+  ResetPasswordInput,
+  VerifyEmailInput,
+} from "../validators/updateProfile.validator";
 import type { User as UserDocument } from "../types/user.types";
 
-// ─── Private Helpers ──────────────────────────────────────────────────────────
-
-/**
- * Step 37.7: Converts a raw Mongoose User document into a sanitized DTO.
- * Password is always excluded. Only safe, necessary fields are returned.
- * This is the ONLY shape that should ever leave the service layer.
- */
 function toDTO(user: UserDocument): UserDTO {
   return {
     id: (user._id as unknown as string).toString(),
@@ -28,37 +31,23 @@ function toDTO(user: UserDocument): UserDTO {
     role: user.role,
     isVerified: user.isVerified,
     isActive: user.isActive,
+    sportsInterests: user.sportsInterests,
+    skillLevel: user.skillLevel,
+    preferredLocation: user.preferredLocation,
+    notificationSettings: user.notificationSettings,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
 }
 
-// ─── Auth Service ─────────────────────────────────────────────────────────────
-// Step 37: This is the brain of the authentication domain.
-// It contains all business logic. No HTTP primitives (req, res, status codes,
-// cookies) are ever touched here — those belong strictly in the controller.
-
-// ─── Step 37.2 — register ─────────────────────────────────────────────────────
-/**
- * Registers a new user account.
- *
- * Flow:
- *   1. Check email uniqueness
- *   2. Check username uniqueness
- *   3. Create user (bcrypt hashing happens inside the model pre-save hook)
- *   4. Return sanitized DTO — no token on register (force explicit login)
- */
 export async function register(dto: RegisterInput): Promise<UserDTO> {
-  // 1. Email uniqueness check
   const emailTaken = await User.exists({ email: dto.email });
   if (emailTaken) {
-    // Step 37.6: Throw a domain error. The global error middleware converts it.
     throw ApiError.conflict("An account with this email already exists", {
       email: ["Email is already registered"],
     });
   }
 
-  // 2. Username uniqueness check
   const usernameTaken = await User.exists({ username: dto.username });
   if (usernameTaken) {
     throw ApiError.conflict("This username is already taken", {
@@ -66,7 +55,6 @@ export async function register(dto: RegisterInput): Promise<UserDTO> {
     });
   }
 
-  // 3. Create user — the model's pre-save hook hashes the password automatically
   const user = await User.create({
     firstName: dto.firstName,
     lastName: dto.lastName,
@@ -75,102 +63,116 @@ export async function register(dto: RegisterInput): Promise<UserDTO> {
     password: dto.password,
   });
 
-  // 4. Return DTO — password never leaves this layer
   return toDTO(user);
 }
 
-// ─── Step 37.3 — login ───────────────────────────────────────────────────────
-/**
- * Authenticates a user and issues an access token.
- *
- * Flow:
- *   1. Find user by email (explicitly select password for comparison)
- *   2. Throw a generic auth error if not found (no email enumeration)
- *   3. Compare provided password against bcrypt hash
- *   4. Generate JWT access token
- *   5. Return DTO + token — the controller decides how to deliver the token
- *
- * Security note: We return the same error for "user not found" and
- * "wrong password" to prevent email enumeration attacks.
- */
 export async function login(
   dto: LoginInput
-): Promise<{ user: UserDTO; accessToken: string }> {
-  // 1. Find user — re-select password since it's excluded by default (select:false)
+): Promise<{ user: UserDTO; accessToken: string; refreshToken: string }> {
   const user = await User.findOne({ email: dto.email }).select("+password");
+  if (!user) throw ApiError.unauthorized("Invalid email or password");
 
-  // 2. Generic auth error for user-not-found (prevents email enumeration)
-  if (!user) {
-    throw ApiError.unauthorized("Invalid email or password");
-  }
-
-  // 3. Compare password using the instance method defined in the model
   const isPasswordValid = await user.comparePassword(dto.password);
-  if (!isPasswordValid) {
-    throw ApiError.unauthorized("Invalid email or password");
-  }
+  if (!isPasswordValid) throw ApiError.unauthorized("Invalid email or password");
 
-  // 4. Generate access token — Step 38 JWT utility
-  const accessToken = generateAccessToken({
+  const payload = {
     userId: (user._id as unknown as string).toString(),
     role: user.role,
-  });
+  };
 
-  // 5. Return sanitized user + token (no raw document, no password)
-  return { user: toDTO(user), accessToken };
+  return {
+    user: toDTO(user),
+    accessToken: generateAccessToken(payload),
+    refreshToken: generateRefreshToken(payload),
+  };
 }
 
-// ─── Step 37.4 — getCurrentUser ──────────────────────────────────────────────
-/**
- * Fetches the latest user document for an authenticated request.
- *
- * The auth middleware will attach req.user.userId after verifying the JWT.
- * This method hits MongoDB to return fresh, up-to-date data — never stale
- * cached data from the token payload.
- */
 export async function getCurrentUser(userId: string): Promise<UserDTO> {
   const user = await User.findById(userId);
-
-  if (!user) {
-    // Could happen if an account was deleted after the JWT was issued
-    throw ApiError.notFound("User account not found");
-  }
-
+  if (!user) throw ApiError.notFound("User account not found");
   return toDTO(user);
 }
 
-// ─── Step 37.5 — updateProfile ───────────────────────────────────────────────
-/**
- * Updates allowed profile fields for an authenticated user.
- *
- * Allowed fields: firstName, lastName, phone, avatar
- * Explicitly forbidden via Zod schema AND this service: email, password,
- * role, isVerified, isActive — these can never be changed via this endpoint.
- */
 export async function updateProfile(
   userId: string,
   dto: UpdateProfileInput
 ): Promise<UserDTO> {
-  // Explicitly whitelist allowed fields — even if the validator is bypassed,
-  // the service enforces the boundary here as a defence-in-depth measure.
-  const allowedUpdates: Partial<UpdateProfileInput> = {};
+  const allowedUpdates: Record<string, unknown> = {};
   if (dto.firstName !== undefined) allowedUpdates.firstName = dto.firstName;
   if (dto.lastName !== undefined) allowedUpdates.lastName = dto.lastName;
   if (dto.phone !== undefined) allowedUpdates.phone = dto.phone;
   if (dto.avatar !== undefined) allowedUpdates.avatar = dto.avatar;
+  if (dto.sportsInterests !== undefined) allowedUpdates.sportsInterests = dto.sportsInterests;
+  if (dto.skillLevel !== undefined) allowedUpdates.skillLevel = dto.skillLevel;
+  if (dto.preferredLocation !== undefined) allowedUpdates.preferredLocation = dto.preferredLocation;
 
   const user = await User.findByIdAndUpdate(
     userId,
     { $set: allowedUpdates },
-    {
-      new: true,      // return updated document
-      runValidators: true, // enforce mongoose schema validators on update
-    }
+    { returnDocument: "after", runValidators: true }
   );
+  if (!user) throw ApiError.notFound("User account not found");
+  return toDTO(user);
+}
 
-  if (!user) {
-    throw ApiError.notFound("User account not found");
+export async function refreshAccessToken(
+  refreshToken: string
+): Promise<{ accessToken: string; refreshToken: string }> {
+  const decoded = verifyRefreshToken(refreshToken);
+  const user = await User.findById(decoded.userId);
+  if (!user || !user.isActive) {
+    throw ApiError.unauthorized("User not found or inactive");
   }
 
-  return toDTO(user);
+  const payload = {
+    userId: (user._id as unknown as string).toString(),
+    role: user.role,
+  };
+
+  return {
+    accessToken: generateAccessToken(payload),
+    refreshToken: generateRefreshToken(payload),
+  };
+}
+
+export async function forgotPassword(dto: ForgotPasswordInput): Promise<void> {
+  const user = await User.findOne({ email: dto.email });
+  if (!user) return;
+
+  user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+}
+
+export async function resetPassword(dto: ResetPasswordInput): Promise<void> {
+  const hashedToken = crypto.createHash("sha256").update(dto.token).digest("hex");
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: new Date() },
+  }).select("+password");
+
+  if (!user) {
+    throw ApiError.badRequest("Token is invalid or has expired");
+  }
+
+  user.password = dto.password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+}
+
+export async function verifyEmail(dto: VerifyEmailInput): Promise<void> {
+  const hashedToken = crypto.createHash("sha256").update(dto.token).digest("hex");
+
+  const user = await User.findOne({
+    emailVerificationToken: hashedToken,
+  });
+
+  if (!user) {
+    throw ApiError.badRequest("Verification token is invalid");
+  }
+
+  user.isVerified = true;
+  user.emailVerificationToken = undefined;
+  await user.save();
 }

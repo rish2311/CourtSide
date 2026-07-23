@@ -1,9 +1,11 @@
-const Sidebar = () => {
+const Footer = () => {
   return (
-    <aside className="w-64 border-r h-full p-4">
-      Sidebar
-    </aside>
+    <footer className="border-t border-outline-variant/30 py-lg text-center">
+      <p className="text-label-sm text-outline">
+        &copy; {new Date().getFullYear()} CourtSide. All rights reserved.
+      </p>
+    </footer>
   );
 };
 
-export default Sidebar;
+export default Footer;

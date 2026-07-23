@@ -18,12 +18,33 @@ export interface User extends Document {
   role: UserRole;
   isVerified: boolean;
   isActive: boolean;
+  sportsInterests?: string[];
+  skillLevel?: SkillLevel;
+  preferredLocation?: string;
+  notificationSettings?: {
+    email: boolean;
+    push: boolean;
+    bookingUpdates: boolean;
+    promotional: boolean;
+  };
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+  emailVerificationToken?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
+export enum SkillLevel {
+  BEGINNER = "BEGINNER",
+  INTERMEDIATE = "INTERMEDIATE",
+  ADVANCED = "ADVANCED",
+  PROFESSIONAL = "PROFESSIONAL",
+}
+
 export interface UserMethods {
   comparePassword(password: string): Promise<boolean>;
+  createPasswordResetToken(): string;
+  createEmailVerificationToken(): string;
 }
 
 export interface UserModel extends Model<User, {}, UserMethods> {}
@@ -42,12 +63,19 @@ export interface UserDTO {
   role: UserRole;
   isVerified: boolean;
   isActive: boolean;
+  sportsInterests?: string[];
+  skillLevel?: SkillLevel;
+  preferredLocation?: string;
+  notificationSettings?: {
+    email: boolean;
+    push: boolean;
+    bookingUpdates: boolean;
+    promotional: boolean;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
 
-// ─── Service Input Types ──────────────────────────────────────────────────────
-// Re-exported from validator schemas for use in the service layer.
 export type { RegisterInput } from "../validators/register.validator";
 export type { LoginInput } from "../validators/login.validator";
 export type { UpdateProfileInput } from "../validators/updateProfile.validator";

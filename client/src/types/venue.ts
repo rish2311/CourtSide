@@ -1,5 +1,3 @@
-import type { SportType } from '@/utils/constants';
-
 // ─── Venue ────────────────────────────────────────────────────────────────────
 
 export interface VenueLocation {
@@ -18,31 +16,61 @@ export interface VenueAmenity {
   icon?: string;
 }
 
+export type VenueStatus = "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
+
 export interface Venue {
   _id: string;
+  id: string;
   name: string;
   description: string;
-  sport: SportType;
-  owner: string;             // User._id
+  owner: string;
   location: VenueLocation;
   images: string[];
-  pricePerHour: number;
   amenities: VenueAmenity[];
-  openTime: string;          // e.g. '06:00'
-  closeTime: string;         // e.g. '22:00'
-  rating: number;
-  totalReviews: number;
+  openTime: string;
+  closeTime: string;
+  status: VenueStatus;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  // UI extras (not always from server)
+  sport?: string;
+  pricePerHour?: number;
+  rating?: number;
+  totalReviews?: number;
+  distance?: number;
+  isFullyBooked?: boolean;
+  tags?: string[];
+  simulatedCoords?: { x: number; y: number };
 }
 
-// ─── Venue Filters ────────────────────────────────────────────────────────────
+export interface VenueListResult {
+  venues: Venue[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
 
 export interface VenueFilters {
-  sport?: SportType;
   city?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  date?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+  owner?: string;
+  sport?: string;
+}
+
+export interface CreateVenuePayload {
+  name: string;
+  description: string;
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+    coordinates: { lat: number; lng: number };
+  };
+  amenities?: { name: string; icon?: string }[];
+  openTime: string;
+  closeTime: string;
 }

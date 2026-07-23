@@ -1,19 +1,43 @@
-// ─── User ─────────────────────────────────────────────────────────────────────
+export const UserRole = {
+  PLAYER: "PLAYER",
+  OWNER: "OWNER",
+  ADMIN: "ADMIN",
+} as const;
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
-export type UserRole = 'user' | 'venue_owner' | 'admin';
+export const SkillLevel = {
+  BEGINNER: "BEGINNER",
+  INTERMEDIATE: "INTERMEDIATE",
+  ADVANCED: "ADVANCED",
+  PROFESSIONAL: "PROFESSIONAL",
+} as const;
+export type SkillLevel = (typeof SkillLevel)[keyof typeof SkillLevel];
 
-export interface User {
-  _id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  avatar?: string;
-  phone?: string;
-  createdAt: string;
-  updatedAt: string;
+export interface NotificationSettings {
+  email: boolean;
+  push: boolean;
+  bookingUpdates: boolean;
+  promotional: boolean;
 }
 
-// ─── Auth Payloads ────────────────────────────────────────────────────────────
+export interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  phone?: string;
+  avatar?: string;
+  role: UserRole;
+  isVerified: boolean;
+  isActive: boolean;
+  sportsInterests?: string[];
+  skillLevel?: SkillLevel;
+  preferredLocation?: string;
+  notificationSettings?: NotificationSettings;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface LoginPayload {
   email: string;
@@ -21,13 +45,27 @@ export interface LoginPayload {
 }
 
 export interface RegisterPayload {
-  name: string;
+  firstName: string;
+  lastName: string;
+  username: string;
   email: string;
   password: string;
-  role?: UserRole;
+  confirmPassword: string;
+}
+
+export interface UpdateProfilePayload {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  avatar?: string;
+  sportsInterests?: string[];
+  skillLevel?: SkillLevel;
+  preferredLocation?: string;
+  notificationSettings?: NotificationSettings;
 }
 
 export interface AuthResponse {
   user: User;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
 }

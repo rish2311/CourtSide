@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CourtSide - Master Your Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-highest": "#dce2f7",
+                        "primary": "#003527",
+                        "outline-variant": "#bfc9c3",
+                        "surface-bright": "#f9f9ff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#293040",
+                        "secondary": "#1b6b51",
+                        "on-tertiary-container": "#ea9e93",
+                        "on-tertiary-fixed-variant": "#6e372f",
+                        "on-surface-variant": "#404944",
+                        "surface-container": "#e9edff",
+                        "secondary-container": "#a6f2d1",
+                        "outline": "#707974",
+                        "surface": "#f9f9ff",
+                        "on-primary-container": "#80bea6",
+                        "on-error": "#ffffff",
+                        "tertiary": "#4f1f19",
+                        "tertiary-fixed-dim": "#ffb4a9",
+                        "surface-tint": "#2b6954",
+                        "inverse-on-surface": "#edf0ff",
+                        "primary-fixed-dim": "#95d3ba",
+                        "on-primary-fixed": "#002117",
+                        "surface-dim": "#d3daef",
+                        "on-surface": "#141b2b",
+                        "tertiary-fixed": "#ffdad5",
+                        "on-tertiary-fixed": "#380d08",
+                        "surface-variant": "#dce2f7",
+                        "surface-container-low": "#f1f3ff",
+                        "secondary-fixed-dim": "#8bd6b6",
+                        "surface-container-high": "#e1e8fd",
+                        "on-background": "#141b2b",
+                        "inverse-primary": "#95d3ba",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#237157",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#b0f0d6",
+                        "tertiary-container": "#6b342d",
+                        "on-secondary-fixed-variant": "#00513b",
+                        "secondary-fixed": "#a6f2d1",
+                        "background": "#f9f9ff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed": "#002116",
+                        "primary-container": "#064e3b",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#0b513d"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "xl": "80px",
+                        "lg": "48px",
+                        "base": "8px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px"
+                    },
+                    fontFamily: {
+                        "label-md": ["Geist", "sans-serif"],
+                        "display-lg": ["Geist", "sans-serif"],
+                        "headline-xl": ["Geist", "sans-serif"],
+                        "display-lg-mobile": ["Geist", "sans-serif"],
+                        "label-sm": ["Geist", "sans-serif"],
+                        "headline-lg": ["Geist", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"]
+                    },
+                    fontSize: {
+                        "label-md": ["14px", { lineHeight: "1.4", letterSpacing: "0.02em", fontWeight: "500" }],
+                        "display-lg": ["64px", { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "700" }],
+                        "headline-xl": ["32px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "600" }],
+                        "display-lg-mobile": ["40px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-sm": ["12px", { lineHeight: "1.2", fontWeight: "600" }],
+                        "headline-lg": ["24px", { lineHeight: "1.3", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+                        "body-md": ["16px", { lineHeight: "1.6", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Geist font placeholder styling if font loading fails, keeping fallback to sans-serif */
+        @font-face {
+            font-family: 'Geist';
+            src: local('Helvetica Neue'), local('Arial');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(191, 201, 195, 0.3);
+        }
+        
+        .soft-elevation {
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+        
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-x-hidden selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm flex justify-between items-center px-80px py-md z-50">
+<div class="flex items-center gap-xl">
+<a class="font-display-lg text-headline-lg tracking-tighter text-primary dark:text-primary-fixed" href="#">CourtSide</a>
+<div class="hidden md:flex gap-lg items-center ml-lg">
+<a class="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-1 cursor-pointer transition-transform active:scale-95" href="#">Discover</a>
+<a class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95" href="#">Venues</a>
+<a class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95" href="#">Memberships</a>
+<a class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95" href="#">Support</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="hidden md:block font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95">Dashboard</button>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded hover:bg-primary-container transition-colors duration-200 cursor-pointer active:scale-95">Book Now</button>
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-outline-variant/30">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A professional headshot of an athletic user with a subtle, focused expression, lit with clean, soft studio lighting against a minimal white background, reflecting a modern, premium lifestyle aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzxAAQegaqBYd898D3EZ5RxptHnuijAD8XB4UhHoGDiMyb_Xh5OROuS9JcjKIvWyefjWOAOoaHhO08hpJeKfMyhNj_YoXLRpLVQaeh_JrrStNR2T2R8D-8Ze4FUYpZkGL0HL364fVdUydrBlqQyQYpPSdiMZn4Ss3V-gOE4WRlWnm3IqQqNs-5HmdYGaldk0AyF0--2zJJUsFm_fQSLotHWCpiczOuJnAx4LHApFSlisecFb15VD0q_wKqhkd_JgQeI2JV68v6cBMM"/>
+</div>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative w-full h-[921px] min-h-[600px] flex items-center pt-xl mt-xl">
+<div class="absolute inset-0 w-full h-full z-0 overflow-hidden">
+<div class="w-full h-full bg-cover bg-center absolute inset-0" data-alt="A cinematic, high-impact photograph of a pristine, professional-grade tennis court captured at magic hour. The lighting casts dramatic, long shadows across the pristine clay or hardcourt surface. The scene conveys elite performance, luxury minimalism, and focused intensity, utilizing a high-contrast aesthetic with deep greens and crisp whites." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDYwb2nDbJTBxqhEr6xUumYAfdJdRhDW1WGtyTAPI8rIiIgrD6gQeL-iXrmZMV-D10uLvoluXsHw78p6mraWg7VfJvYuILTinxN8TMkKdUKJYopUyAK0ovhdRsyXCauu1IGfHx2RfSsBiHYrzeq0GHddzOtLeTwtZmSvuzvO6lBFsqfVzTumeSE7mw0nH1_YWjBTmAhk0QsrWgzIRQlyrscKRVlymIdTpu4MLOaeVZwHLsBy5zkg6ZtODsC0DxylC6k010t94M-iVqM')"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
+</div>
+<div class="relative z-10 w-full max-w-container-max mx-auto px-80px md:px-40px sm:px-20px">
+<div class="max-w-2xl">
+<span class="font-label-md text-label-md text-primary tracking-widest uppercase mb-sm block">Premium Booking Platform</span>
+<h1 class="font-display-lg text-display-lg md:text-display-lg-mobile text-on-surface mb-md">Master Your Game.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-lg max-w-lg">The definitive platform for professional-grade court bookings. Elevate your play with unparalleled access to elite venues.</p>
+<div class="flex gap-md">
+<button class="bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded flex items-center gap-xs hover:bg-primary-container transition-all shadow-md">
+                        Explore Venues
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<button class="bg-transparent text-on-surface font-label-md text-label-md px-lg py-sm rounded border border-outline hover:bg-surface-container transition-all">
+                        Learn More
+                    </button>
+</div>
+</div>
+</div>
+</header>
+<!-- Social Proof Marquee -->
+<section class="w-full py-lg border-b border-outline-variant/30 bg-surface">
+<div class="max-w-container-max mx-auto px-80px text-center mb-md">
+<p class="font-label-sm text-label-sm text-outline tracking-wider uppercase">Trusted by elite clubs worldwide</p>
+</div>
+<div class="marquee-container w-full py-sm">
+<div class="marquee-content flex gap-xl items-center text-outline opacity-60">
+<!-- Repeated content for seamless scrolling -->
+<span class="font-headline-lg text-headline-lg font-bold">WIMBLEDON REC</span>
+<span class="font-headline-lg text-headline-lg font-bold">ROLAND GARROS CLUB</span>
+<span class="font-headline-lg text-headline-lg font-bold">FLUSHING MEADOWS PRO</span>
+<span class="font-headline-lg text-headline-lg font-bold">MELBOURNE PARK ELITE</span>
+<span class="font-headline-lg text-headline-lg font-bold">MONTE CARLO CC</span>
+<span class="font-headline-lg text-headline-lg font-bold ml-xl">WIMBLEDON REC</span>
+<span class="font-headline-lg text-headline-lg font-bold">ROLAND GARROS CLUB</span>
+<span class="font-headline-lg text-headline-lg font-bold">FLUSHING MEADOWS PRO</span>
+<span class="font-headline-lg text-headline-lg font-bold">MELBOURNE PARK ELITE</span>
+<span class="font-headline-lg text-headline-lg font-bold">MONTE CARLO CC</span>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section class="w-full py-xl bg-background">
+<div class="max-w-container-max mx-auto px-80px md:px-40px sm:px-20px">
+<div class="mb-xl max-w-2xl">
+<h2 class="font-headline-xl text-headline-xl text-on-surface mb-sm">Engineered for Excellence.</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Everything you need to secure top-tier facilities and manage your athletic performance, refined into a single, intuitive interface.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Feature 1 -->
+<div class="bg-surface-bright rounded-xl p-lg soft-elevation hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center mb-md text-primary">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">stadium</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Elite Venues</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Exclusive access to premier courts, rigorously vetted to meet professional tournament standards for surface quality and lighting.</p>
+</div>
+<!-- Feature 2 -->
+<div class="bg-surface-bright rounded-xl p-lg soft-elevation hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center mb-md text-primary">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Real-time Availability</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Millisecond-accurate synchronization across all global venues ensures you secure your preferred time slots without friction.</p>
+</div>
+<!-- Feature 3 -->
+<div class="bg-surface-bright rounded-xl p-lg soft-elevation hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center mb-md text-primary">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">sports_kabaddi</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Professional Coaching</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Connect with certified, elite-level instructors to analyze your mechanics and elevate your competitive strategy.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Floating CTA -->
+<div class="fixed bottom-lg right-lg z-50">
+<button class="bg-secondary-container text-on-secondary-container hover:bg-secondary-fixed shadow-lg rounded-full px-lg py-sm font-label-md text-label-md font-bold flex items-center gap-sm transition-transform hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">search</span>
+            Find a Court
+        </button>
+</div>
+</body></html>

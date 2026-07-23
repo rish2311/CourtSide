@@ -1,15 +1,27 @@
-import express, { Express } from "express";
+import express, { type Express } from "express";
 import morgan from "morgan";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import { errorMiddleware } from "./shared/middleware";
+import { env } from "./config/env";
 
 // ─── App Setup ────────────────────────────────────────────────────────────────
 
 const app: Express = express();
 
-// ─── Logging (Step 30) ────────────────────────────────────────────────────────
-// Morgan logs every HTTP request in development.
-// Later: replace with Pino for structured JSON logging in production.
+// ─── CORS ─────────────────────────────────────────────────────────────────────
+app.use(
+  cors({
+    origin: env.CORS_ORIGIN,
+    credentials: true,
+  })
+);
+
+// ─── Cookies ──────────────────────────────────────────────────────────────────
+app.use(cookieParser());
+
+// ─── Logging ──────────────────────────────────────────────────────────────────
 app.use(morgan("dev"));
 
 // ─── Body Parsers ─────────────────────────────────────────────────────────────
@@ -21,13 +33,13 @@ app.get("/", (_req, res) => {
   res.json({ success: true, message: "Courtside Backend Running" });
 });
 
-// ─── Routes (add here later) ─────────────────────────────────────────────────
-// app.use("/api/v1/auth",   authRoutes);
-// app.use("/api/v1/venues", venueRoutes);
-// ...
+// ─── Routes ───────────────────────────────────────────────────────────────────
+import authRoutes from "./modules/auth/routes/auth.routes";
+import venueRoutes from "./modules/venues/routes/venue.routes";
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/venues", venueRoutes);
 
-// ─── Global Error Handler (Step 29) ──────────────────────────────────────────
-// MUST be the last middleware — catches everything thrown via asyncHandler
+// ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use(errorMiddleware);
 
 export default app;
