@@ -3,8 +3,22 @@ export const UserRole = {
   OWNER: "OWNER",
   ADMIN: "ADMIN",
 } as const;
-
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
+
+export const SkillLevel = {
+  BEGINNER: "BEGINNER",
+  INTERMEDIATE: "INTERMEDIATE",
+  ADVANCED: "ADVANCED",
+  PROFESSIONAL: "PROFESSIONAL",
+} as const;
+export type SkillLevel = (typeof SkillLevel)[keyof typeof SkillLevel];
+
+export interface NotificationSettings {
+  email: boolean;
+  push: boolean;
+  bookingUpdates: boolean;
+  promotional: boolean;
+}
 
 export interface User {
   id: string;
@@ -17,6 +31,10 @@ export interface User {
   role: UserRole;
   isVerified: boolean;
   isActive: boolean;
+  sportsInterests?: string[];
+  skillLevel?: SkillLevel;
+  preferredLocation?: string;
+  notificationSettings?: NotificationSettings;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -40,9 +58,14 @@ export interface UpdateProfilePayload {
   lastName?: string;
   phone?: string;
   avatar?: string;
+  sportsInterests?: string[];
+  skillLevel?: SkillLevel;
+  preferredLocation?: string;
+  notificationSettings?: NotificationSettings;
 }
 
 export interface AuthResponse {
   user: User;
   accessToken: string;
+  refreshToken: string;
 }

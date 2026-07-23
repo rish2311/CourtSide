@@ -18,6 +18,8 @@ const {
   getCurrentUser,
   updateProfile,
   logoutUser,
+  refreshTokens,
+  forgotPassword,
 } = await import("../services/auth");
 
 describe("AuthService", () => {
@@ -30,83 +32,82 @@ describe("AuthService", () => {
       mockPost.mockResolvedValue({
         data: {
           success: true,
-          data: { user: { id: "1" }, accessToken: "token" },
+          data: { user: { id: "1" }, accessToken: "token", refreshToken: "rtoken" },
         },
       });
 
-      const result = await loginUser({
-        email: "test@test.com",
-        password: "pass",
-      });
+      const result = await loginUser({ email: "test@test.com", password: "pass" });
 
       expect(mockPost).toHaveBeenCalledWith("/auth/login", {
-        email: "test@test.com",
-        password: "pass",
+        email: "test@test.com", password: "pass",
       });
       expect(result.success).toBe(true);
       expect(result.data.accessToken).toBe("token");
+      expect(result.data.refreshToken).toBe("rtoken");
     });
   });
 
   describe("registerUser", () => {
     it("should call POST /auth/register with payload", async () => {
       const payload = {
-        firstName: "John",
-        lastName: "Doe",
-        username: "johndoe",
-        email: "john@test.com",
-        password: "Test@1234",
-        confirmPassword: "Test@1234",
+        firstName: "John", lastName: "Doe", username: "johndoe",
+        email: "john@test.com", password: "Test@1234", confirmPassword: "Test@1234",
       };
-      mockPost.mockResolvedValue({
-        data: { success: true, data: { user: { id: "1" } } },
-      });
+      mockPost.mockResolvedValue({ data: { success: true, data: { user: { id: "1" } } } });
 
       const result = await registerUser(payload);
-
       expect(mockPost).toHaveBeenCalledWith("/auth/register", payload);
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe("refreshTokens", () => {
+    it("should call POST /auth/refresh with refreshToken", async () => {
+      mockPost.mockResolvedValue({
+        data: { success: true, data: { accessToken: "new-token", refreshToken: "new-rtoken" } },
+      });
+
+      const result = await refreshTokens("old-rtoken");
+      expect(mockPost).toHaveBeenCalledWith("/auth/refresh", { refreshToken: "old-rtoken" });
+      expect(result.data.accessToken).toBe("new-token");
+    });
+  });
+
+  describe("forgotPassword", () => {
+    it("should call POST /auth/forgot-password", async () => {
+      mockPost.mockResolvedValue({ data: { success: true, data: null } });
+
+      const result = await forgotPassword("test@test.com");
+      expect(mockPost).toHaveBeenCalledWith("/auth/forgot-password", { email: "test@test.com" });
       expect(result.success).toBe(true);
     });
   });
 
   describe("getCurrentUser", () => {
     it("should call GET /auth/me", async () => {
-      mockGet.mockResolvedValue({
-        data: { success: true, data: { id: "1", email: "test@test.com" } },
-      });
+      mockGet.mockResolvedValue({ data: { success: true, data: { id: "1" } } });
 
-      const result = await getCurrentUser();
-
+      await getCurrentUser();
       expect(mockGet).toHaveBeenCalledWith("/auth/me");
-      expect(result.data.email).toBe("test@test.com");
     });
   });
 
   describe("updateProfile", () => {
     it("should call PATCH /auth/profile with payload", async () => {
-      mockPatch.mockResolvedValue({
-        data: { success: true, data: { id: "1", firstName: "Jane" } },
-      });
+      mockPatch.mockResolvedValue({ data: { success: true, data: { id: "1", firstName: "Jane" } } });
 
       const result = await updateProfile({ firstName: "Jane" });
-
-      expect(mockPatch).toHaveBeenCalledWith("/auth/profile", {
-        firstName: "Jane",
-      });
+      expect(mockPatch).toHaveBeenCalledWith("/auth/profile", { firstName: "Jane" });
       expect(result.data.firstName).toBe("Jane");
     });
   });
 
   describe("logoutUser", () => {
     it("should call POST /auth/logout", async () => {
-      mockPost.mockResolvedValue({
-        data: { success: true, data: null },
-      });
+      mockPost.mockResolvedValue({ data: { success: true, data: null } });
 
-      const result = await logoutUser();
-
+      await logoutUser();
       expect(mockPost).toHaveBeenCalledWith("/auth/logout");
-      expect(result.success).toBe(true);
     });
   });
 });

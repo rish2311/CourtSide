@@ -1,22 +1,30 @@
-import axios from 'axios';
-
-// ─── Base Axios Instance ──────────────────────────────────────────────────────
+import axios from "axios";
+import useAuthStore from "../store/authStore";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,           // Send cookies with every request (for HTTP-only auth cookies)
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  timeout: 10_000,                 // 10 second timeout
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
+  timeout: 10_000,
 });
 
-// ─── Request Interceptor ──────────────────────────────────────────────────────
-// Automatically attach Bearer token from localStorage (fallback to zustand later)
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+}> = [];
+
+function processQueue(error: unknown, token: string | null) {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) reject(error);
+    else resolve(token!);
+  });
+  failedQueue = [];
+}
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,17 +33,54 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ─── Response Interceptor ─────────────────────────────────────────────────────
-// Handles 401 globally — redirect to login if unauthorized
-
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Clear token and redirect — will hook into auth store later
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        useAuthStore.getState().logout();
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
+
+      try {
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_API_URL}/auth/refresh`,
+          { refreshToken }
+        );
+
+        const { accessToken, refreshToken: newRefreshToken } = data.data;
+        useAuthStore.getState().setTokens(accessToken, newRefreshToken);
+
+        processQueue(null, accessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        useAuthStore.getState().logout();
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
     return Promise.reject(error);
   }
 );

@@ -11,6 +11,8 @@ export const env = {
   PORT: parseInt(optional("PORT", "5000"), 10),
   MONGO_URI: optional("MONGO_URI", ""),
   JWT_SECRET: optional("JWT_SECRET", "fallback-dev-secret"),
+  JWT_REFRESH_SECRET: optional("JWT_REFRESH_SECRET", "fallback-refresh-secret"),
+  JWT_REFRESH_EXPIRES_IN: optional("JWT_REFRESH_EXPIRES_IN", "7d"),
   JWT_EXPIRES_IN: optional("JWT_EXPIRES_IN", "15m"),
   CORS_ORIGIN: optional("CORS_ORIGIN", "http://localhost:5173"),
   REDIS_URL: optional("REDIS_URL", ""),

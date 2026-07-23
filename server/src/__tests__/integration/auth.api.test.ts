@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import request from "supertest";
 import app from "../../app";
-import User from "../../modules/auth/model/user.model";
+
 
 const API_PREFIX = "/api/v1/auth";
 

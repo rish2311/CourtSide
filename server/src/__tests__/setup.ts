@@ -2,6 +2,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 
 process.env.JWT_SECRET = "test-secret";
+process.env.JWT_REFRESH_SECRET = "test-refresh-secret";
 process.env.JWT_EXPIRES_IN = "15m";
 
 let mongoServer: MongoMemoryServer;

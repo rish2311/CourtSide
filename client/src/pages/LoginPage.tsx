@@ -25,7 +25,7 @@ const LoginPage = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await loginUser(data);
-      login(response.data.user, response.data.accessToken);
+      login(response.data.user, response.data.accessToken, response.data.refreshToken);
       toast.success("Login successful");
       navigate("/");
     } catch (error: any) {
@@ -122,12 +122,12 @@ const LoginPage = () => {
             </div>
 
             <div className="flex items-center justify-end">
-              <a
-                href="#"
+              <Link
+                to="/forgot-password"
                 className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <button

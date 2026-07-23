@@ -26,3 +26,23 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
   const user = await authService.updateProfile(req.user!.userId, req.body);
   new ApiResponse(res).success(user, "Profile updated successfully");
 });
+
+export const refresh = asyncHandler(async (req: Request, res: Response) => {
+  const result = await authService.refreshAccessToken(req.body.refreshToken);
+  new ApiResponse(res).success(result, "Tokens refreshed successfully");
+});
+
+export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+  await authService.forgotPassword(req.body);
+  new ApiResponse(res).success(null, "If that email exists, a reset link has been sent");
+});
+
+export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
+  await authService.resetPassword(req.body);
+  new ApiResponse(res).success(null, "Password reset successful");
+});
+
+export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
+  await authService.verifyEmail(req.body);
+  new ApiResponse(res).success(null, "Email verified successfully");
+});
