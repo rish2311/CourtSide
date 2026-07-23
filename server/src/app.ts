@@ -35,7 +35,9 @@ app.get("/", (_req, res) => {
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 import authRoutes from "./modules/auth/routes/auth.routes";
+import venueRoutes from "./modules/venues/routes/venue.routes";
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/venues", venueRoutes);
 
 // ─── Global Error Handler ─────────────────────────────────────────────────────
 app.use(errorMiddleware);

@@ -1,11 +1,32 @@
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "next-themes";
-import { Menu, Moon, Sun, LogOut, User, LayoutDashboard, CalendarCheck } from "lucide-react";
+import {
+  Menu,
+  Moon,
+  Sun,
+  LogOut,
+  User,
+  LayoutDashboard,
+  CalendarCheck,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import useAuthStore from "../store/authStore";
 import { getInitials } from "../utils/helpers";
 import { ROUTES } from "../utils/constants";
@@ -68,7 +89,11 @@ const Navbar = () => {
 
           {/* CTA button */}
           <Link to={ROUTES.VENUES}>
-            <Button variant="default" size="sm" className="hidden sm:inline-flex">
+            <Button
+              variant="default"
+              size="lg"
+              className="hidden  dark:text-white sm:inline-flex"
+            >
               Book Now
             </Button>
           </Link>
@@ -88,13 +113,20 @@ const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                  <p className="text-sm font-medium">
+                    {user.firstName} {user.lastName}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user.email}
+                  </p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   render={
-                    <Link to={ROUTES.PROFILE} className="flex items-center gap-2">
+                    <Link
+                      to={ROUTES.PROFILE}
+                      className="flex items-center gap-2"
+                    >
                       <User className="size-4" />
                       Profile
                     </Link>
@@ -102,7 +134,10 @@ const Navbar = () => {
                 />
                 <DropdownMenuItem
                   render={
-                    <Link to={ROUTES.DASHBOARD} className="flex items-center gap-2">
+                    <Link
+                      to={ROUTES.DASHBOARD}
+                      className="flex items-center gap-2"
+                    >
                       <LayoutDashboard className="size-4" />
                       Dashboard
                     </Link>
@@ -110,7 +145,10 @@ const Navbar = () => {
                 />
                 <DropdownMenuItem
                   render={
-                    <Link to={ROUTES.BOOKINGS} className="flex items-center gap-2">
+                    <Link
+                      to={ROUTES.BOOKINGS}
+                      className="flex items-center gap-2"
+                    >
                       <CalendarCheck className="size-4" />
                       My Bookings
                     </Link>
@@ -135,7 +173,7 @@ const Navbar = () => {
                 </Button>
               </Link>
               <Link to={ROUTES.REGISTER}>
-                <Button variant="default" size="sm">
+                <Button variant="default" size="lg" className="text-white">
                   Sign up
                 </Button>
               </Link>
@@ -144,12 +182,17 @@ const Navbar = () => {
 
           {/* Mobile hamburger */}
           <Sheet>
-            <SheetTrigger className="md:hidden" render={<Button variant="ghost" size="icon" />}>
+            <SheetTrigger
+              className="md:hidden"
+              render={<Button variant="ghost" size="icon" />}
+            >
               <Menu className="size-5" />
             </SheetTrigger>
             <SheetContent side="right" showCloseButton className="w-72">
               <SheetHeader>
-                <SheetTitle className="text-left font-heading text-xl text-primary">CourtSide</SheetTitle>
+                <SheetTitle className="text-left font-heading text-xl text-primary">
+                  CourtSide
+                </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-1 px-4 mt-4">
                 {links.map((link) => (
@@ -178,21 +221,32 @@ const Navbar = () => {
                       <div className="flex items-center gap-3">
                         <Avatar>
                           {user.avatar ? (
-                            <AvatarImage src={user.avatar} alt={user.firstName} />
+                            <AvatarImage
+                              src={user.avatar}
+                              alt={user.firstName}
+                            />
                           ) : null}
                           <AvatarFallback>
                             {getInitials(`${user.firstName} ${user.lastName}`)}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
-                          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                          <p className="text-sm font-medium">
+                            {user.firstName} {user.lastName}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {user.email}
+                          </p>
                         </div>
                       </div>
                       <SheetClose
                         render={
                           <Link to={ROUTES.PROFILE}>
-                            <Button variant="outline" size="sm" className="w-full justify-start">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-start"
+                            >
                               <User className="size-4 mr-2" />
                               Profile
                             </Button>
@@ -202,7 +256,11 @@ const Navbar = () => {
                       <SheetClose
                         render={
                           <Link to={ROUTES.BOOKINGS}>
-                            <Button variant="outline" size="sm" className="w-full justify-start">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full justify-start"
+                            >
                               <CalendarCheck className="size-4 mr-2" />
                               My Bookings
                             </Button>
@@ -224,7 +282,11 @@ const Navbar = () => {
                       <SheetClose
                         render={
                           <Link to={ROUTES.LOGIN}>
-                            <Button variant="outline" size="sm" className="w-full">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full"
+                            >
                               Log in
                             </Button>
                           </Link>

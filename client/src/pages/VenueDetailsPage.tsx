@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import type { Venue } from "@/types/venue";
+import { getVenue } from "@/services/venues";
 
 const timeSlots = [
   { time: "08:00 AM", court: "Center Court (Indoor)", available: false },
@@ -13,9 +15,36 @@ const timeSlots = [
 const days = Array.from({ length: 28 }, (_, i) => i + 1);
 
 const VenueDetailsPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const [venue, setVenue] = useState<Venue | null>(null);
+  const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState<number | null>(14);
   const [selectedSlot, setSelectedSlot] = useState<string | null>("10:00 AM");
   const [selectedCourt, setSelectedCourt] = useState("Center Court (Indoor)");
+
+  useEffect(() => {
+    if (!id) return;
+    getVenue(id)
+      .then((res) => setVenue(res.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="pt-[100px] flex items-center justify-center text-outline text-label-md">
+        Loading venue...
+      </div>
+    );
+  }
+
+  if (!venue) {
+    return (
+      <div className="pt-[100px] flex items-center justify-center text-outline text-label-md">
+        Venue not found.
+      </div>
+    );
+  }
 
   return (
     <div className="pt-[100px] pb-xl px-md md:px-xl mx-auto max-w-container-max w-full grid grid-cols-1 lg:grid-cols-12 gap-gutter">
@@ -26,47 +55,80 @@ const VenueDetailsPage = () => {
               Venues
             </Link>
             <span className="material-symbols-outlined text-sm">chevron_right</span>
-            <Link to="/venues" className="hover:text-primary transition-colors">
-              London
-            </Link>
-            <span className="material-symbols-outlined text-sm">chevron_right</span>
-            <span className="text-primary font-semibold">The Wimbledon Social</span>
+            <span className="text-primary font-semibold">{venue.name}</span>
           </div>
 
           <h1 className="text-display-lg-mobile md:text-display-lg text-primary mb-md">
-            The Wimbledon Social
+            {venue.name}
           </h1>
 
           <div className="grid grid-cols-4 grid-rows-2 gap-sm h-[400px] md:h-[500px] rounded-xl overflow-hidden shadow-sm border border-outline-variant/30">
             <div
               className="col-span-4 md:col-span-3 row-span-2 relative group overflow-hidden bg-cover bg-center transition-transform duration-700 hover:scale-[1.02]"
               style={{
-                backgroundImage:
-                  "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCZOvXFcw5-wWsoE92wShcCcWf27WppmqeKNOawXc-x3br--JwxOU75WVmjZM-PpGzOt4y-qeasO6T2vKBASwl99UzsBfD0xKPBf-9mRvqs0W0Xhm9RjTTEUWpTIZNiumB8c8lKktUEjm-FzpRbA7vVpWmACYCq4hhABA3p89lMTjgzxsdqxvE-IUY6epXDhcXQQg1xj2GGk8U5m-7eYT2NH406-TQtyKoCjaJvuNcx8ifKU4wfUk-vH7kzzUDS5m-IBCU8S1EsnzuI')",
+                backgroundImage: `url('${venue.images[0] || ""}')`,
               }}
             />
-            <div
-              className="hidden md:block col-span-1 row-span-1 relative group overflow-hidden bg-cover bg-center transition-transform duration-700 hover:scale-105"
-              style={{
-                backgroundImage:
-                  "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCfVA2bOiihAf2REbudncFLSLohHUa5Z5vIx5fRncdsiDhsjSjXnVfjCbah3pigb0OGiozgS9mCfIhgKLzr57E4ZTAswTI0LS1n91dYDiOdJtYlZqplBJTH_jcKCU34I2r176LdVyzG3OPhYnIKFVrDm0DUiNeWjixFhclqt_czLzK1tqI39fTHwHAoSmOBrpapaGw_NXIsY7myBb1n1PHnYfjyKr-6-8fYnC8NPk2ZFxFblDYCDpp8PA6a4jBBK93b3qo4DapFiXEP')",
-              }}
-            />
-            <div
-              className="hidden md:block col-span-1 row-span-1 relative group overflow-hidden bg-cover bg-center transition-transform duration-700 hover:scale-105"
-              style={{
-                backgroundImage:
-                  "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC6g3mEgtuFwWNOjtWCrS60mdVlXanyynehGOcXImfSjlX_1Myt2Ksk6SAs1MXsS7GVrn7qsac88g4vlpupA_Pa_KHci52LMhm8hLXj6Ij2x6lBk_b4OckFW9yhr79vuWzBKpYbE7e5FicalEVV7mmj-Ij35GiU64WNBSCRsgyc3thgHKo9FxNEnSoEhjfTXyzoSYPXcbl6HAMpIFLvzEAPfi7u6_mPljDqZGvPe3cq9MtJWZe9gIgTRIRe5I26kBBtJrxyLewtk9CZ')",
-              }}
-            >
-              <div className="absolute inset-0 bg-primary/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
-                <span className="text-white font-label-md flex items-center">
-                  <span className="material-symbols-outlined mr-2">grid_view</span>
-                  View All
-                </span>
+            {venue.images[1] && (
+              <div
+                className="hidden md:block col-span-1 row-span-1 relative group overflow-hidden bg-cover bg-center transition-transform duration-700 hover:scale-105"
+                style={{ backgroundImage: `url('${venue.images[1]}')` }}
+              />
+            )}
+            {venue.images[2] && (
+              <div
+                className="hidden md:block col-span-1 row-span-1 relative group overflow-hidden bg-cover bg-center transition-transform duration-700 hover:scale-105"
+                style={{ backgroundImage: `url('${venue.images[2]}')` }}
+              >
+                <div className="absolute inset-0 bg-primary/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
+                  <span className="text-white font-label-md flex items-center">
+                    <span className="material-symbols-outlined mr-2">grid_view</span>
+                    View All
+                  </span>
+                </div>
               </div>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-md mt-md">
+            <div className="flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-lg">
+              <span className="material-symbols-outlined text-primary text-sm">schedule</span>
+              <span className="text-label-md text-on-surface">
+                {venue.openTime} - {venue.closeTime}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-lg">
+              <span className="material-symbols-outlined text-primary text-sm">location_on</span>
+              <span className="text-label-md text-on-surface">
+                {venue.location.address}, {venue.location.city}
+              </span>
             </div>
           </div>
+        </section>
+
+        <section className="space-y-lg">
+          <h2 className="text-headline-xl text-primary border-b border-outline-variant/30 pb-sm">
+            About
+          </h2>
+          <p className="text-body-lg text-on-surface-variant leading-relaxed">
+            {venue.description}
+          </p>
+
+          {venue.amenities.length > 0 && (
+            <div className="flex flex-wrap gap-md">
+              {venue.amenities.map((amenity, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 bg-surface-container-low px-4 py-3 rounded-lg border border-outline-variant/30"
+                >
+                  {amenity.icon && (
+                    <span className="material-symbols-outlined text-secondary text-sm">{amenity.icon}</span>
+                  )}
+                  <span className="text-label-md text-on-surface">{amenity.name}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="space-y-lg">
